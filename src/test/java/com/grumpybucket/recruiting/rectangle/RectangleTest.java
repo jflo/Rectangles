@@ -42,5 +42,38 @@ public class RectangleTest{
                 Rectangle rect = new Rectangle( new Point(-1,-2), 3,2);
         }
 
+        @Test
+        public void testBogusConstruction() {
+                Assertions.assertThrows(NullPointerException.class, () -> {
+                        Rectangle r = new Rectangle(null, 1,1);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), 0,1);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), 1,0);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), 0,0);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), 0,-1);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), -1,0);
+                        }
+                );
+                Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                                Rectangle r = new Rectangle(new Point(0,0), -1,-1);
+                        }
+                );
+
+
+        }
 
 }

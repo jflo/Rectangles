@@ -24,7 +24,7 @@ public class IntersectionTest {
     }
 
     @Test
-    public void testContainment() {
+    public void testPointContainment() {
         Rectangle r = new Rectangle(new Point(0,0), 5, 5);
         Assertions.assertTrue(r.contains(new Point(2,2)));
         Assertions.assertFalse(r.contains(new Point(-1,-1)));
@@ -36,13 +36,35 @@ public class IntersectionTest {
     public void testBasicIntersection() {
 
         Rectangle onTheLeft = new Rectangle(
-                new Point(-5, 0), 3, 4);
+                new Point(-5, 0), 3, 8);
 
         Rectangle onTheRight = new Rectangle(
-                new Point(-2, 0), 3, 8);
-
+                new Point(-2, -2), 3, 4);
 
         Assertions.assertTrue(onTheLeft.intersects(onTheRight));
+    }
 
+    @Test
+    public void testIncompleteEdgeIntersection() {
+        //TODO: i'm not sure if the client wants this, reverse this test if they don't.
+        Rectangle onTheLeft = new Rectangle(new Point(0,0), 2,2);
+        Rectangle downAndRight = new Rectangle(new Point(-1,-1), 2,2);
+
+        Assertions.assertTrue(onTheLeft.intersects(downAndRight));
+    }
+
+    @Test
+    public void testPerfectOverlap() {
+        Rectangle r = new Rectangle(new Point(0,0), 5,5);
+        //TODO: check with client if this is right
+        Assertions.assertTrue(r.intersects(r));
+    }
+
+    @Test
+    public void testContainment() {
+        //TODO: check with client if contained rectangles should ALSO be considered intersected
+        Rectangle superset = new Rectangle(new Point(0,0), 5,5);
+        Rectangle subset = new Rectangle(new Point(1,1), 2,2);
+        Assertions.assertTrue(subset.intersects(superset));
     }
 }
