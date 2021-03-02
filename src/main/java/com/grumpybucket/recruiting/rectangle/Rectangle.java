@@ -4,42 +4,42 @@ import java.awt.Point;
 
 public class Rectangle {
 
-    private Point a;
+    public final Point origin;
     private Point b;
     private Point c;
     private Point d;
+    public final int width; //if java.awt.Point used floats, the dimensions would be floats instead.
+    public final int height;
+
+
+    public Rectangle(Point origin, int height, int width) {
+
+        this.origin = origin;
+        this.b = new Point(origin.x, origin.y+height);
+        this.c = new Point(origin.x+width, origin.y+height);
+        this.d = new Point( origin.x+width, origin.y);
+        this.width = width;
+        this.height = height;
+    }
+
+    public boolean intersects(Rectangle intersectee) {
+        boolean iContainAnyOfIt = (this.contains(intersectee.origin) ||
+                this.contains(intersectee.b) ||
+                this.contains(intersectee.c) ||
+                this.contains(intersectee.d));
+        boolean itContainsAnyOfMe = (intersectee.contains(this.origin) ||
+                intersectee.contains(this.b) ||
+                intersectee.contains(this.c) ||
+                intersectee.contains(this.d));
+        return (iContainAnyOfIt || itContainsAnyOfMe);
+    }
 
     /**
-     * A Rectangle is a clockwise wound array of points
-     * @param a
-     * @param b
-     * @param c
-     * @param d
+     *
+     * @param p
+     * @return whether or not the supplied point falls within the rectangle
      */
-    public Rectangle(Point a, Point b, Point c, Point d) {
-
-        if(Rectangle.slope(a, b) == Rectangle.slope(c, d)) {
-            if(Rectangle.slope(b, c) == Rectangle.slope(d, a)) {
-                this.a = a;
-                this.b = b;
-                this.c = c;
-                this.d = d;
-            } else {
-                throw new IllegalArgumentException("non parallel sides detected");
-            }
-        } else {
-            throw new IllegalArgumentException("non parallel sides detected");
-        }
-    }
-
-    public static float slope(Point a, Point b) {
-        if(b.x - a.x == 0) {
-            return 0; //to avoid dividing by zero.
-        }
-        return (b.y - a.y)/(b.x - a.x);
-    }
-
-    public boolean intersects(Rectangle onTheRight) {
-        return false;
+    public boolean contains(Point p) {
+        return (p.x >= origin.x && p.x <= origin.x+height && p.y >= origin.y && p.y <= origin.y+height);
     }
 }
