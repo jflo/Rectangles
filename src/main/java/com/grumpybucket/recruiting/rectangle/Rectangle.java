@@ -1,7 +1,7 @@
 package com.grumpybucket.recruiting.rectangle;
 
 import java.awt.Point;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A 4 sided parallelogram with arbitrarily long sides. It is always wound clockwise from an origin point.
@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Rectangle {
 
     //TODO: might there be a need to derive a relationship between 2 rectangles without having to check each one?
+    //future feature could be a static method that takes 2 rectangles, and tells you how they relate
 
     public final Point origin;
     private Point topLeft;
@@ -16,7 +17,9 @@ public class Rectangle {
     private Point bottomRight;
     public final int width; //if java.awt.Point used floats, the dimensions would be floats instead.
     public final int height;
+    private final List<LineSegment> sides = Arrays.asList(new LineSegment[4]); //rectangles always have 4 sides, wound from the origin
 
+    private final Map<Integer, Integer> opposingSides = new HashMap<Integer, Integer>();
     /**
      *
      * @param origin The bottom left point of the rectangle
@@ -34,6 +37,16 @@ public class Rectangle {
         this.bottomRight = new Point( origin.x+width, origin.y);
         this.width = width;
         this.height = height;
+
+        sides.set(0, new LineSegment(this.origin, this.topLeft));
+        sides.set(1, new LineSegment(this.topLeft, this. topRight));
+        sides.set(2, new LineSegment(this.topRight, this.bottomRight));
+        sides.set(3, new LineSegment(this.bottomRight, this.origin));
+
+        opposingSides.put(0,2); //todo ask a peer if there is some math i'm missing to not need to map this....
+        opposingSides.put(1,3);
+        opposingSides.put(2,0);
+        opposingSides.put(3,1);
     }
 
     /**
@@ -70,4 +83,32 @@ public class Rectangle {
                 this.contains(subset.topRight) &&
                 this.contains(subset.bottomRight));
     }
+
+    /**
+     * Two rectangles are adjacent if they each have an alternate side, of the same slope, sharing the same slopedposition
+     * @param adjoinee
+     * @return
+     */
+    public boolean adjacentTo(Rectangle adjoinee) {
+        //for each of my sides, is there a side on the adjoinee with the same slope, at the same location?
+        //comparing even sides depends on the x coord, odd sides the y
+
+        //normally i would iterate with streams, but in this case i need to do useful things with the iteration value
+        for(int i=0; i<this.sides.size(); i++) {
+            if(i % 2 == 0) { //evens are vertical sides, compare x vals
+                if(this.sides.get(i).to.x == adjoinee.sides.get(opposingSides.get(i)).to.x) {
+                    //trust that the from and to points are aligned
+                    return true;
+                }
+            } else { //odds are horizontal sides, compare y vals
+                if(this.sides.get(i).to.y == adjoinee.sides.get(opposingSides.get(i)).to.y) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
 }

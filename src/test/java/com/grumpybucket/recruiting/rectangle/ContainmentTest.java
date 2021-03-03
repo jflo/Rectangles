@@ -38,5 +38,5 @@ public class ContainmentTest {
         Assertions.assertTrue(originSquare.contains(originSquare));
     }
 
-    
+
 }
