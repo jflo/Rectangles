@@ -1,17 +1,23 @@
 package com.grumpybucket.recruiting.rectangle;
 
 import java.awt.Point;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
- * A 4 sided parallelogram with arbitrarily long sides. It is always wound clockwise from an origin point.
+ * A 4 sided parallelogram with arbitrarily long, parallel sides. It is always wound clockwise from an origin point.
+ * Demo purposes only, you shouldn't actually use this, java.awt.Rectangle is a thing
  */
 public class Rectangle {
 
     //TODO: might there be a need to derive a relationship between 2 rectangles without having to check each one?
     //future feature could be a static method that takes 2 rectangles, and tells you how they relate
 
-    public final Point origin;
+    public final Point origin; //
     private Point topLeft;
     private Point topRight;
     private Point bottomRight;
@@ -20,11 +26,12 @@ public class Rectangle {
     private final List<LineSegment> sides = Arrays.asList(new LineSegment[4]); //rectangles always have 4 sides, wound from the origin
 
     private final Map<Integer, Integer> opposingSides = new HashMap<Integer, Integer>();
+
     /**
      *
      * @param origin The bottom left point of the rectangle
-     * @param height
-     * @param width
+     * @param height integer value of how wide this is along the x axis
+     * @param width integer value of how tall this is along the y axis
      */
     public Rectangle(Point origin, int height, int width) {
 
@@ -51,11 +58,12 @@ public class Rectangle {
 
     /**
      *
-     * @param intersectee
+     * @param intersectee a Rectangle to check for intersection with this.
      * @return whether any of the supplied rectangle falls within this Rectangle.
      */
     //TODO: clarify with client if point overlap is sufficient, or if they intended this to only consider
-    //edges that fall within it.
+    //entire edges that fall within it.
+
     public boolean intersects(Rectangle intersectee) {
         boolean iContainAnyOfIt = (this.contains(intersectee.origin) ||
                 this.contains(intersectee.topLeft) ||
@@ -70,6 +78,34 @@ public class Rectangle {
 
     /**
      *
+     * @param r another Rectangle which will be intersected with this
+     * @return an Optional<Rectangle> representing the area and position of the intersection. returns null if this does not intersect with r.
+     */
+    public Optional<Rectangle> intersectedBy(Rectangle r) {
+
+        if(!this.intersects(r)) { //just bail asap if they don't intersect.
+            return null;
+        }
+
+        //the intersections origin is the greater of each component
+        Point intersectionOrigin = new Point(Math.max(this.origin.x, r.origin.x), Math.max(this.origin.y, r.origin.y));
+        //the intersections diagonal is the lesser of each component
+        Point intersectionDiagonal = new Point(Math.min(r.topRight.x, r.topRight.x), Math.min(r.topRight.y, r.topRight.y));
+
+        int intersectionWidth = intersectionDiagonal.x - intersectionOrigin.x;
+        int intersectionHeight = intersectionDiagonal.y - intersectionOrigin.y;
+
+        if(intersectionOrigin.x >= intersectionDiagonal.x || intersectionOrigin.y >= intersectionDiagonal.y) {
+            //thats a totally backwards, degenerate intersection, which shouldn't happen if you checked 'em
+            return null;
+        }
+
+        return Optional.of(new Rectangle(intersectionOrigin, intersectionHeight,intersectionWidth));
+
+    }
+
+    /**
+     *
      * @param p
      * @return whether or not the supplied point falls within the rectangle
      */
@@ -77,6 +113,11 @@ public class Rectangle {
         return (p.x >= origin.x && p.x <= origin.x+height && p.y >= origin.y && p.y <= origin.y+height);
     }
 
+    /**
+     *
+     * @param subset - a Rectangle to consider if it is fully bounded within this
+     * @return true if all of subset fits within this, false of any of it does not.
+     */
     public boolean contains(Rectangle subset) {
         return (this.contains(subset.origin) &&
                 this.contains(subset.topLeft) &&
@@ -87,7 +128,7 @@ public class Rectangle {
     /**
      * Two rectangles are adjacent if they each have an alternate side, of the same slope, sharing the same slopedposition
      * @param adjoinee
-     * @return
+     * @return true if the adjoinee is tanget to this on a single side.
      */
     public boolean adjacentTo(Rectangle adjoinee) {
         //for each of my sides, is there a side on the adjoinee with the same slope, at the same location?
@@ -110,5 +151,6 @@ public class Rectangle {
         return false;
     }
 
-
+    //TODO: while specs detail different types of adjacency, there is no indication that those need to be determined.
+    //talk to client for further details if they need that or not.
 }

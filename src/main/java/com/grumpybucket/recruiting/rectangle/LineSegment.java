@@ -1,8 +1,10 @@
 package com.grumpybucket.recruiting.rectangle;
 
-import javax.sound.sampled.Line;
-import java.awt.*;
+import java.awt.Point;
 
+/**
+ * Used to represent the edges of a Rectangle.
+ */
 public class LineSegment {
 
     public final Point from;
